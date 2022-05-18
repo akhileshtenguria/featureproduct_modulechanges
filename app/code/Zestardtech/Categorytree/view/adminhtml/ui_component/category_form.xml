@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<form xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Ui:etc/ui_configuration.xsd">
+<!-- 	  <dataSource name="zestardtech_form_data_source">
+        <argument name="dataProvider" xsi:type="configurableObject">
+            <argument name="class" xsi:type="string">Zestardtech\Categorytree\Model\ResourceModel\Category\DataProvider</argument>
+            <argument name="name" xsi:type="string">zestardtech_form_data_source</argument>
+            <argument name="primaryFieldName" xsi:type="string">entity_id</argument>
+            <argument name="requestFieldName" xsi:type="string">select_categories</argument>
+            <argument name="data" xsi:type="array">
+                <item name="config" xsi:type="array">
+                    <item name="submit_url" xsi:type="url" path="catalog/catagory/save"/>
+                </item>
+            </argument>
+        </argument> 
+        <argument name="data" xsi:type="array">
+            <item name="js_config" xsi:type="array">
+                <item name="component" xsi:type="string">Magento_Ui/js/form/provider</item>
+            </item>
+        </argument>
+    </dataSource>  -->
+   <!--  <fieldset name="general">
+		<field name="select_categories">
+		    <argument name="data" xsi:type="array">	
+		        <item name="options" xsi:type="object">Zestardtech\Categorytree\Model\Category\Attribute\Source\SelectCategories</item>
+		        <item name="config" xsi:type="array">
+		            <item name="label" xsi:type="string" translate="true">Category Tree</item>
+		            <item name="componentType" xsi:type="string">field</item>
+		            <item name="formElement" xsi:type="string">multiselect</item>
+		            <item name="component" xsi:type="string">Magento_Ui/js/form/element/ui-select</item>
+		            <item name="elementTmpl" xsi:type="string">ui/grid/filters/elements/ui-select</item>
+		            <item name="dataScope" xsi:type="string">select_categories</item>
+		            <item name="filterOptions" xsi:type="boolean">true</item>
+		            <item name="showCheckbox" xsi:type="boolean">true</item>
+		            <item name="disableLabel" xsi:type="boolean">true</item>
+		            <item name="sortOrder" xsi:type="number">70</item>
+		            <item name="multiple" xsi:type="boolean">true</item>
+		            <item name="levelsVisibility" xsi:type="number">0</item>
+		            <item name="required" xsi:type="boolean">true</item>
+		            <item name="source" xsi:type="string">category</item>
+		            <item name="validation" xsi:type="array">
+		                <item name="required-entry" xsi:type="boolean">false</item>
+		            </item>
+		            <item name="listens" xsi:type="array">
+		                <item name="${ $.namespace }.${ $.namespace }:responseData" xsi:type="string">setParsed</item>
+		            </item>
+		        </item>
+		    </argument>
+		</field>
+    </fieldset>   -->      
+
+    <fieldset name="assign_category_grid">
+	    <argument name="data" xsi:type="array">
+	        <item name="config" xsi:type="array">
+	            <item name="label" xsi:type="string" translate="true">Assign Categories</item>
+	            <item name="collapsible" xsi:type="boolean">true</item>
+	            <item name="sortOrder" xsi:type="number">130</item>
+	        </item>
+	    </argument>
+	    <container name="assign_category_container" >
+	        <argument name="data" xsi:type="array">
+	            <item name="config" xsi:type="array">
+	                <item name="sortOrder" xsi:type="number">230</item>
+	            </item>
+	        </argument>
+	        <htmlContent name="html_content">
+	            <argument name="block" xsi:type="object">Zestardtech\Categorytree\Block\Adminhtml\AssignCategories</argument>
+	        </htmlContent>
+	    </container>
+	</fieldset>
+</form>

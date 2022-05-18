@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<form xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Ui:etc/ui_configuration.xsd">
+    <!-- <fieldset name="custom_category_tab" sortOrder="80">
+        <settings>
+            <collapsible>true</collapsible>
+            <label translate="true">Custom Category Tab</label>
+        </settings>
+        <container name="custom_tab" sortOrder="180">
+            <htmlContent name="html_content">
+                <block name="custom_category_block" class="Zestardtech\Featureproduct\Block\Adminhtml\Custom\Tab"/>
+            </htmlContent>
+        </container>
+    </fieldset> -->
+    <fieldset name="assign_product_grid">
+	    <argument name="data" xsi:type="array">
+	        <item name="config" xsi:type="array">
+	            <item name="label" xsi:type="string" translate="true">Feature Products</item>
+	            <item name="collapsible" xsi:type="boolean">true</item>
+	            <item name="sortOrder" xsi:type="number">30</item>
+	        </item>
+	    </argument>
+	    <container name="assign_products_container" >
+	        <argument name="data" xsi:type="array">
+	            <item name="config" xsi:type="array">
+	                <item name="sortOrder" xsi:type="number">170</item>
+	            </item>
+	        </argument>
+	        <htmlContent name="html_content">
+	            <argument name="block" xsi:type="object">Zestardtech\Featureproduct\Block\Adminhtml\AssignProducts</argument>
+	        </htmlContent>
+	    </container>
+	</fieldset>
+
+</form>

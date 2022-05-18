@@ -1,0 +1,224 @@
+<?php 
+$product = $block->getCurrentProduct();
+$currencySymbol = $block->getCurrencySymbol();
+$productimages = $product->getMediaGalleryImages();
+$total_product_images = sizeof($productimages);
+$image_url = $block->getPlaceHolderImage();
+$galleryImages = $product->getMediaGalleryImages();
+$total_images = sizeof($galleryImages);
+$product_url = $product->getProductUrl(); 
+$product_id = $product->getId();
+$_product_name = $product->getName();
+?>
+
+<div class="container" id="product_type_one">
+
+	<!-- Before Filter Template Content Start -->
+			<div class="flex_view product_content reverse">
+				<div class="product_images  col-sm-5">
+					<h1 class="product_title"><?= $product->getName(); ?></h1>
+						<div data-mage-init='{"slickwrapper": {"el": ".product_main_img_slider","slidesToShow": 1,"slidesToScroll": 1,"asNavFor": ".product_thumb_img_slider","fade": true}}'>
+							<div class="product_main_img_slider">
+								<?php if($total_images > 0 ):?> 
+										<?php $i=0;?>
+											<?php foreach($galleryImages as $productimage): ?>
+												<?php if($productimage['media_type'] == 'image' ): ?>
+													<div class="product_img">
+														<img src="<?= $productimage['url']; ?>" title="<?= $productimage['label']; ?>" data-zoom-image="<?= $productimage['url']; ?>" alt="<?= $productimage['label']; ?>" />
+													</div>
+												<?php else: ?>
+													<div class="product_img vid_wrapper">
+														<iframe width="560" height="315" src="<?= $productimage['video_url'];?>" frameborder="0" allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+													</div>
+												<?php endif; ?>
+											<?php endforeach; ?>
+								<?php else: ?>
+									<div class="product_img">
+										<img src="<?= $image_url; ?>" alt="<?= $_product_name; ?>" data-zoom-image="<?= $image_url; ?>" title="<?= $_product_name; ?>" />
+									</div>
+								<?php endif; ?>
+							</div>
+						</div>
+					<div data-mage-init='{"slickwrapper": {"el": ".product_thumb_img_slider","slidesToShow": 3,"slidesToScroll": 1,"asNavFor": ".product_main_img_slider","focusOnSelect" : true}}'>
+						<div class="product_thumb_img_slider">
+								<?php if($total_images > 0 ): ?> 
+										<?php $i=0; ?>
+										<?php foreach($galleryImages as $productimage): ?>
+											<?php if($productimage['media_type'] == 'image' ): ?>
+											<div class="product_img">
+												<img itemprop="image" href="<?= $productimage['url']; ?>" src="<?= $productimage['url']; ?>" data-zoom-image="<?= $productimage['url']; ?>" title="<?= $productimage['label']; ?>" alt="<?= $productimage['label']; ?>" />
+											</div>
+											<?php else: ?>
+												<div class="product_img">
+													<img itemprop="image" href="<?= $productimage['url']; ?>" src="<?= $productimage['url']; ?>" data-zoom-image="<?= $productimage['url']; ?>" title="<?= $productimage['label']; ?>" alt="<?= $productimage['label']; ?>" />
+												</div>
+											<?php endif; ?>
+										<?php endforeach; ?>
+								<?php else: ?>
+									<div class="product_img">
+										<img itemprop="image" href="<?= $image_url; ?>" src="<?= $image_url; ?>" data-zoom-image="<?= $image_url; ?>" alt="<?= $_product_name; ?>" title="<?= $_product_name; ?>" />
+									</div>
+							<?php endif; ?>
+						</div>
+					</div>
+				</div>
+				<div class="product_data col-sm-7">
+					<h1 class="product_title"><?= $product->getName(); ?></h1>
+						<div class="product_description">
+							<?= $product->getDescription(); ?>
+						</div>
+						<div class="product_info_btn flex_view_xs middle">
+							<div class="product_left_btn">
+								<?php if($product->getDescription()!=''): ?>
+									<div class="view_more_btn">
+										<?=  __('View More'); ?> 
+										<i class="down"></i>
+									</div>
+								<?php endif; ?>
+									<div class="view_less_btn">
+										<?= __('View Less'); ?>
+										<i class="up"></i>
+									</div>
+							</div>
+							<div class="product_right_btn">
+								<?php if($product->getData('youtube_video_id')!=''): ?>
+									<div class="video_btn bt-action-youtube" data="Video">
+										<img src="<?= $this->getViewFileUrl('images/video-icon.svg'); ?>" alt="Video" />
+										<?= __('Video'); ?>
+									</div>
+								<?php endif; ?>
+								<?php if($product->getData('more_info_filepath')!=''): ?>	
+								<div class="more_info_btn bt-action" data="More Info" >
+									<img src="<?= $this->getViewFileUrl('images/more-info.svg'); ?>" alt="More Info" />
+									<?= __('More Info'); ?>
+								</div>
+								<?php endif; ?>
+								<?php if($product->getData('colour_chart_filepath')!=''): ?>
+								<div class="colour_chart_btn bt-action-color" data="Colour Chart">
+									<img src="<?= $this->getViewFileUrl('images/more-info.svg'); ?>" alt="Colour Chart" />
+									<?= __('Colour Chart'); ?>
+								</div>
+								<?php endif; ?>
+							</div>
+						</div>
+					<div class="review-rating-block flex_view_xs middle">
+						<div class="review-rating">
+							<?php
+							$reviewFactory = $block->getObjManager()->create('Magento\Review\Model\Review');
+							$reviewlist = $block->getReviewCollection($product->getId());
+							$reviwCount = sizeof($reviewlist);
+							$review_total_text = $reviwCount;
+							$storeId = $block->getCurrentStoreId();
+							$reviewFactory->getEntitySummary($product, $storeId);
+							$ratingSummary = $product->getRatingSummary()->getRatingSummary();
+							$ratingValue = $ratingSummary;
+							?>
+							<?php if($reviwCount==0): ?>
+								<?php $ratingSummary = 0;
+									$reviwCount =0;
+									$ratingValue = 0;
+								?>
+							<?php endif; ?>
+							<div class="rating-summary item">
+								<?php if(sizeof($reviewlist) >= 0): ?>
+									<div class="rating-result" title="<?= $ratingSummary.__('%');?>">
+										<?php 
+										$ratValueInPercentage = $ratingSummary > 0 ? $ratingSummary : 0;
+										?>
+										<span style="width:<?= $ratValueInPercentage.__('%');?>">
+											<span ><?= $ratingValue; ?></span>
+										</span>
+									</div>
+								 <?php endif; ?>
+								<span><?= $review_total_text.__(' reviews'); ?></span>
+							</div>
+						</div>
+						<div class="review-btn">
+							<a href="javascript:;"><?= __('Write Review'); ?></a>
+						</div>
+						<div class="share-btn">
+							<a class="share-icon" href="javascript:;">
+								<img src="<?= $this->getViewFileUrl('images/share-icon.svg'); ?>" alt="Share icon">
+								<span><?= __('Share'); ?></span>
+							</a>
+								<div id="sharesocialmedia-addtoany">
+									<!-- AddToAny BEGIN -->
+									<div class="a2a_kit a2a_kit_size_32 a2a_default_style" data-a2a-url="<?= $product_url; ?>" data-a2a-title="<?= $_product_name; ?>">
+									<a class="a2a_button_facebook"></a>
+									<a class="a2a_button_twitter"></a>
+									<a class="a2a_button_email"></a>
+									<a class="a2a_button_whatsapp"></a>
+									<a class="a2a_button_facebook_messenger"></a>
+									<a class="a2a_button_pinterest"></a>
+									<a class="a2a_dd" style="display: none;" href="https://www.addtoany.com/share"></a>
+									</div>
+									<script async src="https://static.addtoany.com/menu/page.js"></script>
+									<!-- AddToAny END -->					
+								</div>
+						</div>
+					</div>					
+				</div>
+			</div>
+			<div class="product_review_div_list" style="display: none;">
+				<?php
+				$resource = $block->getResource();
+				$connection = $resource->getConnection();
+				$rating_option_vote = $resource->getTableName('rating_option_vote'); //gives table name with prefix
+				?>
+				<?php if(sizeof($reviewlist) > 0 ): ?>
+					<?php foreach($reviewlist as $_review): ?>
+						<?php 
+						$review_id = $_review['review_id'];
+						$result_review = $block->getFetchReview($review_id);
+						$percentage = 0;
+						?>
+						<?php if(!empty($result_review)): ?>
+							<?php $percentage = $result_review[0]['percent']; ?>
+						<?php endif; ?>
+						<div class="review_list">
+						<div class="rating-summary item" itemprop="reviewRating" itemscope="" id="reviewrats" >
+							<div class="rating-result" title="<?= $percentage.__('%');?>">
+								<meta itemprop="worstRating" content="1">
+								<meta itemprop="bestRating" content="100">
+								<span style="width:<?= $percentage.__('%');?>">
+									<span itemprop="ratingValue"><?= $percentage.__('%'); ?></span>
+								</span>
+							</div>
+						</div>
+						<p class="review-title"><?= $_review['title'];?></p>
+						<p><?= $_review['detail'];?></p>
+							<p>
+								<?= $_review['nickname'];?> 
+								<?= $_review['created_at'];?>
+							</p>
+						</div>
+					<?php endforeach; ?>
+				<?php else: ?>
+					<?= __('No Reviews!'); ?>
+				<?php endif; ?>
+			</div>
+			<div class="product_review_div" style="display: none;"></div>
+				<?php if($reviwCount > 0 ): ?>
+					<div itemprop="review" itemtype="http://schema.org/Review" itemscope>
+						<?php foreach($reviewlist as $_review): ?>
+							<?php 
+							$review_id = $_review['review_id'];
+							$result_review = $block->getFetchReview($review_id);
+							$percentage = 0;
+							?>
+							<?php if(!empty($result_review)): ?>
+								<?php $percentage = $result_review[0]['percent'];?>
+							<?php endif; ?>
+							<div itemprop="author" itemtype="http://schema.org/Person" itemscope>
+								<meta itemprop="name" content="<?= $_review['nickname'];?>" />
+							</div>
+							<div itemprop="reviewRating" itemtype="http://schema.org/Rating" itemscope>
+								<meta itemprop="ratingValue" content="<?= $percentage;?>" />
+								<meta itemprop="bestRating" content="100" />
+							</div>
+						<?php endforeach;?>
+					</div>
+				<?php endif; ?>
+	<!-- Before Filter Template Content End -->
+
+</div>

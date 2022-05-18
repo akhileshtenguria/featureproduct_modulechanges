@@ -1,0 +1,33 @@
+<?xml version="1.0"?>
+<page layout="1column" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:framework:View/Layout/etc/page_configuration.xsd">
+    <head>
+        <script src="Magento_Catalog::js/configurable.js"  />
+    </head>    
+    <body>
+        <referenceContainer name="content">
+            <block  class="Zestardtech\GroupedProduct\Block\GroupedProduct" name="pdp-grouped-product" before="product.info" template="Zestardtech_GroupedProduct::groupedproduct/groupedproduct.phtml" />
+            <block class="Magento\Framework\View\Element\Template" name="pdp-grouped-product-js" template="Zestardtech_GroupedProduct::groupedproduct/groupedproduct_js.phtml"/>
+            <block class="Magento\Catalog\Block\Product\View" name="product.info" template="Zestardtech_GroupedProduct::groupedproduct/form.phtml" after="alert.urls">
+                <container name="product.info.form.content" as="product_info_form_content">
+                    <block class="Magento\Catalog\Block\Product\View" name="product.info.addtocart" as="addtocart" template="Zestardtech_GroupedProduct::groupedproduct/addtocart.phtml"/>
+                </container>
+             </block>
+        </referenceContainer>
+
+        <referenceContainer name="product.info.form.content">
+            <block class="Magento\GroupedProduct\Block\Product\View\Type\Grouped" name="product-info-grouped-custom" before="product.info.addtocart" template="Zestardtech_GroupedProduct::groupedproduct/grouped.phtml"/>
+            <container name="product.info.grouped.extra" after="product-info-grouped-custom" before="product-info-grouped-custom" as="product_type_data_extra" label="Product Extra Info"/>
+        </referenceContainer>
+
+        <referenceBlock name="product.info.media.image" remove="true"/>
+         <!-- <referenceBlock name="product.info.details" remove="true" />  -->
+         <referenceBlock name="product.info.grouped" remove="true" /> -->
+        <referenceBlock name="product.info.review" remove="true" />
+        <!-- <referenceBlock name="product.info.addtocart" remove="true" />  -->
+        <referenceBlock name="product.info.sku" remove="true" />
+        <referenceBlock name="product.info.grouped.stock" remove="true" />
+        <referenceBlock name="page.main.title" remove="true" />
+        <!-- <referenceBlock name="product.info.addto" remove="true" /> -->
+        <referenceBlock name="product.info.social" remove="true" />          
+    </body>
+</page>

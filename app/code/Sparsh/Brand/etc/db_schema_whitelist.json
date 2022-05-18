@@ -1,0 +1,68 @@
+{
+    "sparsh_brand": {
+        "column": {
+            "brand_id": true,
+            "title": true,
+            "description": true,
+            "meta_title": true,
+            "meta_keywords": true,
+            "meta_description": true,
+            "url_key": true,
+            "image": true,
+            "banner_image": true,
+            "position": true,
+            "status": true,
+            "creation_time": true,
+            "update_time": true
+        },
+        "constraint": {
+            "PRIMARY": true
+        }
+    },
+    "sparsh_brand_products": {
+        "column": {
+            "brand_product_id": true,
+            "sbrand_id": true,
+            "product_id": true,
+            "title": true,
+            "description": true,
+            "meta_title": true,
+            "meta_keywords": true,
+            "meta_description": true,
+            "url_key": true,
+            "image": true,
+            "banner_image": true,
+            "position": true,
+            "status": true,
+            "creation_time": true,
+            "update_time": true,
+            "brand_id": true
+        },
+        "constraint": {
+            "PRIMARY": true,
+            "SPARSH_BRAND_PRDS_PRD_ID_CAT_PRD_ENTT_ENTT_ID": true,
+            "SPARSH_BRAND_PRODUCTS_SBRAND_ID_SPARSH_BRAND_BRAND_ID": true,
+            "SPARSH_BRAND_PRODUCTS_BRAND_ID_SPARSH_BRAND_BRAND_ID": true
+        }
+    },
+    "sparsh_brand_store": {
+        "column": {
+            "brand_id": true,
+            "store_id": true
+        },
+        "constraint": {
+            "SPARSH_BRAND_STORE_BRAND_ID_SPARSH_BRAND_BRAND_ID": true,
+            "SPARSH_BRAND_STORE_STORE_ID_STORE_STORE_ID": true
+        }
+    },
+    "sparsh_brand_customer_group": {
+        "column": {
+            "brand_id": true,
+            "customer_group_id": true
+        },
+        "constraint": {
+            "SPARSH_BRAND_CUSTOMER_GROUP_BRAND_ID_SPARSH_BRAND_BRAND_ID": true,
+            "SPARSH_BRAND_CSTR_GROUP_CSTR_GROUP_ID_CSTR_GROUP_CSTR_GROUP_ID": true
+        }
+    }
+}

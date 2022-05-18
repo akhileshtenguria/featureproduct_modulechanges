@@ -1,0 +1,143 @@
+<?php
+/**
+ * Copyright © Magento, Inc. All rights reserved.
+ * See COPYING.txt for license details.
+ */
+/**
+ * Grouped product data template
+ *
+ * @var $block \Magento\Catalog\Block\Product\View\BaseImage
+ * @var $block \Magento\GroupedProduct\Block\Product\View\Type\Grouped
+ */
+?>
+<?php 
+$viewModel = $block->getGroupedProductViewmodel();
+$currencySymbol = $viewModel->getCurrencySymbol();
+?>
+
+<?php $block->setPreconfiguredValue(); ?>
+<?php $_product = $block->getProduct(); ?>
+<?php $_associatedProducts = $block->getAssociatedProducts(); ?>
+<?php $_hasAssociatedProducts = count($_associatedProducts) > 0; ?>
+
+<div class="table-wrapper grouped">
+    <table class="table data grouped"
+           id="super-product-table"
+           data-mage-init='{ "Magento_GroupedProduct/js/product-ids-resolver": {} }'>
+        <caption class="table-caption"><?= $block->escapeHtml(__('Grouped product items')) ?></caption>
+        <thead>
+        <tr>
+            <th class="col item-sku" scope="col"><?= $block->escapeHtml(__('SKU')) ?></th>
+            <th class="col item" scope="col"><?= $block->escapeHtml(__('Product Name')) ?></th>
+            <?php if ($_product->isSaleable()) : ?>
+                <th class="col qty" scope="col"><?= $block->escapeHtml(__('Qty')) ?></th>
+            <?php endif; ?>
+            <?php if ($block->getCanShowProductPrice($_product)) : ?>
+                <th class="col product-price" scope="col"><?= $block->escapeHtml(__('Price')) ?></th>
+            <?php endif; ?>
+        </tr>
+        </thead>
+
+        <?php if ($_hasAssociatedProducts) : ?>
+        <tbody>
+            <?php foreach ($_associatedProducts as $_item) : ?>
+            <tr>
+                <td class="group-product-sku">
+                    <a href="<?= $_item->getProductUrl(); ?>"><?= $block->escapeHtml($_item->getSku()) ?></a>
+                </td>
+                <td data-th="<?= $block->escapeHtml(__('Product Name')) ?>" class="col item">
+                    <strong class="product-item-name"><?= $block->escapeHtml($_item->getName()) ?></strong>
+                </td>
+                <?php if ($_product->isSaleable()) : ?>
+                <td data-th="<?= $block->escapeHtml(__('Qty')) ?>" class="col qty">
+                    <?php if ($_item->isSaleable()) : ?>
+                        <?php 
+                            $lastqty = 0;
+                            $isSalable = $_item->getIsSalable();
+                            $availqty = 0;
+                            $qty = $viewModel->getProductSalableQty($_item->getSku());
+                        ?>
+                        <?php if($isSalable=='1'): ?>
+                            <?php $lastqty = 1; ?>
+                        <?php endif; ?>
+
+                        <?php if(!empty($qty)): ?>
+                            <?php if($qty[0]['manage_stock']=='1'): ?>
+                                <?php $availqty = $qty[0]['qty']; ?>
+                            <?php else: ?>
+                                <?php $availqty = '1'; ?>
+                            <?php endif; ?>
+                        <?php endif; ?>
+
+                    <div class="control qty">
+                        <div class="dec button"><?= __('−'); ?></div>
+                                            <input type="number"
+                                                   name="super_group[<?= $block->escapeHtmlAttr($_item->getId()) ?>]"
+                                                   data-selector="super_group[<?= $block->escapeHtmlAttr($_item->getId()) ?>]"
+                                                   value="<?= $block->escapeHtmlAttr($_item->getQty() * 1) ?>"
+                                                   title="<?= $block->escapeHtmlAttr(__('Qty')) ?>"
+                                                   class="input-text qty"
+                                                   data-id="<?= $lastqty; ?>"
+                                                   data-qty="<?= $availqty; ?>"
+                                                   data="<?= $_item->getId(); ?>"
+                                                   data-validate="{'validate-grouped-qty':'#super-product-table'}"
+                                                   data-errors-message-box="#validation-message-box"/>
+                        <div class="inc button"><?= __('+'); ?></div>
+                        <div class="error_<?= /* @escapeNotVerified */ $_item->getId(); ?> qtyerror" ></div>
+                    </div>                                                
+                <?php else : ?>
+                    <div class="stock unavailable" title="<?= $block->escapeHtmlAttr(__('Availability')) ?>">
+                        <?php 
+                        $baseUrl = $this->getBaseUrl();
+                        $currentUrl = $this->getUrl('*/*/*', ['_current' => true, '_use_rewrite' => true]); 
+                        $productId = $_item->getId();
+                        $encodedUrl = urlencode(base64_encode($currentUrl));
+                        $notifyCustomUrl = $baseUrl.'productalert/add/stock/product_id/'.$productId.'/uenc/'.$encodedUrl;
+                        ?>  
+                        <div id="custom-notify-me" class="custom-notify-me-when-this-product-in-stock">
+                                <a href="<?= $notifyCustomUrl; ?>" title="Notify me when this product is in stock" class="action alert">
+                                    <?= __('Notify me when this product is in stock');?>
+                                </a>
+                        </div>                        
+                    </div>
+                <?php endif; ?>
+                </td>
+                <td>
+                    <?php if ($block->getCanShowProductPrice($_product)) : ?>
+                        <?php if ($block->getCanShowProductPrice($_item)) : ?>
+                            <?= $currencySymbol.number_format($_item->getPrice(), 2, '.', ''); ?>
+                        <?php endif; ?>
+                    <?php endif; ?>                        
+                </td>
+                <?php endif; ?>
+            </tr>
+                <?php if ($block->getCanShowProductPrice($_product)
+                && $block->getCanShowProductPrice($_item)
+                && trim($block->getProductPriceHtml(
+                    $_item,
+                    \Magento\Catalog\Pricing\Price\TierPrice::PRICE_CODE
+                ))) : ?>
+                <tr class="row-tier-price">
+                    <td colspan="2">
+                        <?= $block->getProductPriceHtml(
+                            $_item,
+                            \Magento\Catalog\Pricing\Price\TierPrice::PRICE_CODE
+                        ) ?>
+                    </td>
+                </tr>
+            <?php endif; ?>
+        <?php endforeach; ?>
+        </tbody>
+        <?php else : ?>
+        <tbody>
+            <tr>
+                <td class="unavailable"
+                    colspan="<?php if ($_product->isSaleable()) : ?>4<?php else : ?>3<?php endif; ?>">
+                    <?= $block->escapeHtml(__('No options of this product are available.')) ?>
+                </td>
+            </tr>
+        </tbody>
+        <?php endif; ?>
+    </table>
+</div>
+<div id="validation-message-box"></div>

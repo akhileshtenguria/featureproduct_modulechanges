@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+/**
+ * Created By : MageDelight Pvt. Ltd.
+ */
+-->
+<schema xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:framework:Setup/Declaration/Schema/etc/schema.xsd">
+   <table name="sparsh_brand" resource="default" engine="innodb" comment="Sparsh Brand Table">
+      <column xsi:type="int" name="brand_id" padding="6"  nullable="false" identity="true" comment="Brand ID" />
+      <column xsi:type="varchar" name="title" nullable="false" length="20" comment="Name" />
+      <column xsi:type="varchar" name="description" nullable="false" length="225" comment="Email" />
+      <column xsi:type="varchar" name="meta_title" nullable="false" length="20" comment="Email" />
+      <column xsi:type="varchar" name="meta_keywords" nullable="false" length="20" comment="Email" />
+      <column xsi:type="varchar" name="meta_description" nullable="false" length="20" comment="Email" />
+      <column xsi:type="varchar" name="url_key" nullable="false" length="20" comment="Email" />
+      <column xsi:type="text" name="image" nullable="false"  comment="Email" />
+      <column xsi:type="text" name="banner_image" nullable="false"  comment="Email" />
+      <column xsi:type="smallint" name="position" padding="7" unsigned="false" nullable="false" comment="Brand ID" />
+      <column xsi:type="smallint" name="status" padding="7" unsigned="false" nullable="false"  comment="Brand ID" />
+      <column xsi:type="datetime" name="creation_time" nullable="false" comment="Descrition" />
+      <column xsi:type="datetime" name="update_time" nullable="false" comment="Descrition" />
+      <constraint xsi:type="primary" referenceId="PRIMARY">
+         <column name="brand_id" />
+      </constraint>
+   </table>
+
+    <table name="sparsh_brand_products" resource="default" engine="innodb" comment="Sparsh Brand products Table">
+      <column xsi:type="int" name="brand_product_id" padding="7" unsigned="false" nullable="false" identity="true" comment="Brand ID" />
+      <column xsi:type="int" name="brand_id" padding="6" nullable="false" comment="SBrand ID" />
+      <column xsi:type="int" name="product_id" unsigned="true" nullable="false"   comment="Product ID" />
+      <column xsi:type="varchar" name="title" nullable="false" length="20" comment="Name" />
+      <column xsi:type="varchar" name="description" nullable="false" length="20" comment="Email" />
+      <column xsi:type="varchar" name="meta_title" nullable="false" length="20" comment="Email" />
+      <column xsi:type="varchar" name="meta_keywords" nullable="false" length="20" comment="Email" />
+      <column xsi:type="varchar" name="meta_description" nullable="false" length="20" comment="Email" />
+      <column xsi:type="varchar" name="url_key" nullable="false" length="20" comment="Email" />
+      <column xsi:type="text" name="image" nullable="false"  comment="Email" />
+      <column xsi:type="text" name="banner_image" nullable="false"  comment="Email" />
+      <column xsi:type="smallint" name="position" padding="7" unsigned="false" nullable="false"  comment="Brand ID" />
+      <column xsi:type="smallint" name="status" padding="7" unsigned="false" nullable="false"  comment="Brand ID" />
+      <column xsi:type="datetime" name="creation_time" nullable="false" comment="Descrition" />
+      <column xsi:type="datetime" name="update_time" nullable="false" comment="Descrition" />
+      <constraint xsi:type="primary" referenceId="PRIMARY">
+         <column name="brand_product_id" />
+      </constraint>
+      <constraint xsi:type="foreign" referenceId="SPARSH_BRAND_PRODUCTS_SBRAND_ID_SPARSH_BRAND_BRAND_ID" table="sparsh_brand_products" column="brand_id" referenceTable="sparsh_brand" referenceColumn="brand_id"  onDelete="CASCADE" /> 
+      <constraint xsi:type="foreign" referenceId="SPARSH_BRAND_PRDS_PRD_ID_CAT_PRD_ENTT_ENTT_ID" table="sparsh_brand_products" column="product_id" referenceTable="catalog_product_entity" referenceColumn="entity_id" onDelete="CASCADE" />
+   </table>
+   <table name="sparsh_brand_store" resource="default" engine="innodb" comment="sparsh brand store table">
+      <column xsi:type="int" name="brand_id" padding="6" unsigned="false" nullable="false" identity="false" comment="Brand ID" />
+      <column xsi:type="smallint" name="store_id" padding="6" unsigned="true"  nullable="false" comment="Store ID" />
+      
+      <!-- <constraint xsi:type="primary" referenceId="PRIMARY">
+         <column name="brand_id" />
+      </constraint> -->
+      <constraint xsi:type="foreign" referenceId="SPARSH_BRAND_STORE_BRAND_ID_SPARSH_BRAND_BRAND_ID" table="sparsh_brand_store" column="brand_id" referenceTable="sparsh_brand" referenceColumn="brand_id"  onDelete="CASCADE" /> 
+      <constraint xsi:type="foreign" referenceId="SPARSH_BRAND_STORE_STORE_ID_STORE_STORE_ID" table="sparsh_brand_store" column="store_id" referenceTable="store" referenceColumn="store_id" onDelete="CASCADE" />
+   </table>
+   <table name="sparsh_brand_customer_group" resource="default" engine="innodb" comment="Sparsh Brand products Table">
+      <column xsi:type="int" name="brand_id" padding="6" unsigned="false" nullable="false" identity="false" comment="Brand ID" />
+      <column xsi:type="int" name="customer_group_id" padding="6" unsigned="true"  nullable="false" comment="Store ID" />
+      
+      <!-- <constraint xsi:type="primary" referenceId="PRIMARY">
+         <column name="brand_id" />
+      </constraint> -->
+      <constraint xsi:type="foreign" referenceId="SPARSH_BRAND_CUSTOMER_GROUP_BRAND_ID_SPARSH_BRAND_BRAND_ID" table="sparsh_brand_customer_group" column="brand_id" referenceTable="sparsh_brand" referenceColumn="brand_id"  onDelete="CASCADE" /> 
+      <constraint xsi:type="foreign" referenceId="SPARSH_BRAND_CUST_GROUP_CUST_GROUP_ID_CUST_GROUP_CUST_GROUP_ID" table="sparsh_brand_customer_group" column="customer_group_id" referenceTable="customer_group" referenceColumn="customer_group_id" onDelete="CASCADE" />
+   </table>
+</schema>
