@@ -41,18 +41,21 @@ class Categorygrid extends \Magento\Backend\Block\Widget\Grid\Extended
         \Magento\Backend\Helper\Data $backendHelper,
         \Magento\Catalog\Model\ProductFactory $productFactory,
         // \Magento\Catalog\Model\ResourceModel\Product\CollectionFactory $productCollFactory,
-        \Magento\Catalog\Model\ResourceModel\Category\CollectionFactory $categoryCollFactory,
+        // \Magento\Catalog\Model\ResourceModel\Category\CollectionFactory $categoryCollFactory,
+        \Zestardtech\Categorytree\Model\ResourceModel\Assigncategory\CollectionFactory $assignCateFactory,
         \Magento\Framework\Registry $coreRegistry,
         \Magento\Framework\Module\Manager $moduleManager,
         \Magento\Store\Model\StoreManagerInterface $storeManager,
+        \Magento\Catalog\Model\CategoryFactory $categoryFactory,
         Visibility $visibility = null,
         array $data = []
     ) {
         $this->productFactory = $productFactory;
-        $this->categoryCollFactory = $categoryCollFactory;
+        $this->assignCateFactory = $assignCateFactory;
         $this->coreRegistry = $coreRegistry;
         $this->moduleManager = $moduleManager;
         $this->_storeManager = $storeManager;
+        $this->categoryFactory = $categoryFactory;
         $this->visibility = $visibility ?: ObjectManager::getInstance()->get(Visibility::class);
         parent::__construct($context, $backendHelper, $data);
     }
@@ -64,7 +67,7 @@ class Categorygrid extends \Magento\Backend\Block\Widget\Grid\Extended
     protected function _construct()
     {
         parent::_construct();
-        $this->setId('rh_grid_products');
+        $this->setId('rh_grid_category');
         $this->setDefaultSort('id');
         $this->setDefaultDir('ASC');
         $this->setUseAjax(true);
@@ -89,82 +92,20 @@ class Categorygrid extends \Magento\Backend\Block\Widget\Grid\Extended
     }
 
     
-    protected function _prepareCollection()
+       protected function _addColumnFilterToCollection($column)
     {
-        $store = $this->_getStore();
-        $collection = $this->productFactory->create()->getCollection()->addAttributeToSelect(
-            'sku'
-        )->addAttributeToSelect(
-            'name'
-        )->addAttributeToSelect(
-            'attribute_set_id'
-        )->addAttributeToSelect(
-            'type_id'
-        )->setStore(
-            $store
-        );
-
-        if ($this->moduleManager->isEnabled('Magento_CatalogInventory')) {
-            $collection->joinField(
-                'qty',
-                'cataloginventory_stock_item',
-                'qty',
-                'product_id=entity_id',
-                '{{table}}.stock_id=1',
-                'left'
-            );
-        }
-        if ($store->getId()) {
-            $collection->setStoreId($store->getId());
-            $collection->addStoreFilter($store);
-            $collection->joinAttribute(
-                'name',
-                'catalog_product/name',
-                'entity_id',
-                null,
-                'inner',
-                Store::DEFAULT_STORE_ID
-            );
-            $collection->joinAttribute(
-                'status',
-                'catalog_product/status',
-                'entity_id',
-                null,
-                'inner',
-                $store->getId()
-            );
-            $collection->joinAttribute(
-                'visibility',
-                'catalog_product/visibility',
-                'entity_id',
-                null,
-                'inner',
-                $store->getId()
-            );
-            $collection->joinAttribute('price', 'catalog_product/price', 'entity_id', null, 'left', $store->getId());
-        } else {
-            $collection->addAttributeToSelect('price');
-            $collection->joinAttribute('status', 'catalog_product/status', 'entity_id', null, 'inner');
-            $collection->joinAttribute('visibility', 'catalog_product/visibility', 'entity_id', null, 'inner');
-        }
-        $this->setCollection($collection);
-        return parent::_prepareCollection();
-    }
-
-    
-    protected function _addColumnFilterToCollection($column)
-    {
-        if ($column->getId() == 'in_products') {
-            $productIds = $this->_getSelectedProducts();
-            if (empty($productIds)) {
-                $productIds = 0;
+        // Set custom filter for in category flag
+        // echo $column->getId(); 
+        // die; 
+        if ($column->getId() == 'in_categories') {
+            $categoryIds = $this->_getSelectedCategories();
+            if (empty($categoryIds)) {
+                $categoryIds = 0;
             }
             if ($column->getFilter()->getValue()) {
-                $this->getCollection()->addFieldToFilter('entity_id', ['in' => $productIds]);
-            } else {
-                if ($productIds) {
-                    $this->getCollection()->addFieldToFilter('entity_id', ['nin' => $productIds]);
-                }
+                $this->getCollection()->addFieldToFilter('entity_id', ['in' => $categoryIds]);
+            } elseif (!empty($categoryIds)) {
+                $this->getCollection()->addFieldToFilter('entity_id', ['nin' => $categoryIds]);
             }
         } else {
             parent::_addColumnFilterToCollection($column);
@@ -173,95 +114,67 @@ class Categorygrid extends \Magento\Backend\Block\Widget\Grid\Extended
     }
 
     /**
-     * @return Extended
+     * Apply various selection filters to prepare the category grid collection.
+     *
+     * @return $this
+     */
+    protected function _prepareCollection()
+    {
+        $collection = $this->categoryFactory->create()
+            ->getCollection()
+            ->addAttributeToSelect('*');
+
+        $collection->getSelect()
+            ->reset(\Zend_Db_Select::COLUMNS)
+            ->columns(['entity_id']);
+            
+        $collection->addAttributeToSelect('*')
+            ->addFieldToFilter('name', ["neq"=>null])
+            ->addFieldToFilter('is_active', 1)
+            ->addAttributeToFilter('level' , 2);
+            
+        $this->setCollection($collection);
+        return parent::_prepareCollection();
+    }
+
+    /**
+     * @inheritdoc
      */
     protected function _prepareColumns()
     {
+
         $this->addColumn(
-            'in_products',
+            "in_categories",
             [
-                'type' => 'checkbox',
-                'html_name' => 'product_id',
-                'required' => true,
-               // 'values' => $this->_getSelectedProducts(),
-                'align' => 'center',
-                'index' => 'id',
+                "type"     => "checkbox",
+                "name"     => "in_categories",
+                "align"    => "left",
+                "width"    => "100px",
+                "index"    => "entity_id",
+                "values"   => $this->_getSelectedCategories(),
+                "header"   => __("Select"),
+                "sortable" => false
+            ]
+        );
+        $this->addColumn(
+            "entity_id",
+            [
+                "type"     => "number",
+                "align"    => "left",
+                "width"    => "30px",
+                "index"    => "entity_id",
+                "header"   => __("Category ID")
             ]
         );
 
         $this->addColumn(
-            'id',
+            "name",
             [
-                'header' => __('ID'),
-                'width' => '50px',
-                'index' => 'id',
-                'type' => 'number',
+                "index"    => "name",
+                "align"    => "left",
+                "header"   => __("Category Name")
             ]
         );
-        $this->addColumn(
-            'name',
-            [
-                'header' => __('Name'),
-                'index' => 'name',
-                'header_css_class' => 'col-type',
-                'column_css_class' => 'col-type',
-            ]
-        );
-       /* $this->addColumn(
-            'sku',
-            [
-                'header' => __('SKU'),
-                'index' => 'sku',
-                'header_css_class' => 'col-sku',
-                'column_css_class' => 'col-sku',
-            ]
-        );
-
-        $this->addColumn(
-            'image',
-            array(
-                'header' => __('Image'),
-                'index' => 'image',
-                // 'filter' => false,
-                'renderer'  => '\Zestardtech\Featureproduct\Block\Adminhtml\Tab\Grid\Renderer\Image',
-            )
-        );*/
-        /*$this->addColumn(
-            'thumbnail',
-            [
-                'header' => __('thumbnail'),
-                'index' => 'thumbnail',
-                'header_css_class' => 'col-sku',
-                'column_css_class' => 'col-sku',
-            ]
-        );*/
-      
-       /* $this->addColumn(
-            'price',
-            [
-                'header' => __('Price'),
-                'type' => 'price',
-                'currency_code' => $store->getBaseCurrency()->getCode(),
-                'index' => 'price',
-                'header_css_class' => 'col-price',
-                'column_css_class' => 'col-price',
-            ]
-        );*/
-        /*$this->addColumn(
-            'position',
-            [
-                'header' => __('Position'),
-                'name' => 'position',
-                'width' => 60,
-                'type' => 'number',
-                'validate_class' => 'validate-number',
-                'index' => 'position',
-                'editable' => true,
-                'edit_only' => true,
-                'editable' => !$this->getProductsPosition()
-            ]
-        );*/
-
         $this->addColumn(
             'position',
             [
@@ -276,23 +189,47 @@ class Categorygrid extends \Magento\Backend\Block\Widget\Grid\Extended
 
             ]
         );
-          $store = $this->_getStore();
-       /* $this->addColumn(
-            'product_position',
+
+    
+
+     /*   $this->addColumn(
+            "inv",
             [
-                'header' => __('Position'),
-                'name' => 'product_position',
-                'width' => 60,
-                'type' => 'number',
-                'validate_class' => 'validate-number',
-                'index' => 'position',
-                'editable' => true,
-                'edit_only' => true,
-                // 'editable' => $this->getProductsPosition()
+                "type"     => "input",
+                "class"    => "number_check loyalty_points",
+                "width"    => "150px",
+                "align"    => "center",
+                "index"    => "inv",
+                "filter"   => false,
+                "header"   => __("Loyalty Points"),
+                "sortable" => false,
+                "renderer" => \Vendor\CustomModule\Block\Adminhtml\Points::class
             ]
         );*/
-          
+        
         return parent::_prepareColumns();
+    }
+
+    /**
+     * @inheritdoc
+     */
+   
+
+    /**
+     * @return array
+     */
+    protected function _getSelectedCategories()
+    {
+        $categoryIds = [];
+        $catId      = $this->getRequest()->getParam("id");
+       
+        $pointsCollection = $this->assignCateFactory->create()->addFieldToFilter('category_id', $catId);
+       
+        foreach ($pointsCollection as $each) {
+            $categoryIds[] = $each->getAssignCategoryId();
+        }
+        // print_r($categoryIds);
+        return $categoryIds;
     }
 
     /**
@@ -300,19 +237,19 @@ class Categorygrid extends \Magento\Backend\Block\Widget\Grid\Extended
      */
     public function getGridUrl()
     {
-        return $this->getUrl('featureproduct/index/grids', ['_current' => true]);
+        return $this->getUrl('categorytree/index/grids', ['_current' => true]);
     }
 
     /**
      * @return array
      */
-    protected function _getSelectedProducts()
+    /*protected function _getSelectedProducts()
     {
         $products = $this->getSelectedProducts();
         // print_r($products);
         // die; 
         return $products;
-    }
+    }*/
 
     /**
      * @return array
@@ -337,20 +274,26 @@ class Categorygrid extends \Magento\Backend\Block\Widget\Grid\Extended
      */
     public function getSelectedProducts()
     {        
-        $id = $this->getRequest()->getParam('id');
-        $model = $this->productCollFactory->create()->addFieldToFilter('category_id', $id);
+      /*  $id = $this->getRequest()->getParam('id');
+        $collection = $this->categoryCollFactory->create();
         
         $grids = [];
-        foreach ($model as $key => $value) {
-            $grids[] = $value->getProductId();
-        }
- 
-        /*$prodId = [];
+        foreach ($collection as $key => $value) {
+            $_objectManager = \Magento\Framework\App\ObjectManager::getInstance();
+            $category = $_objectManager->create('Magento\Catalog\Model\Category')->load($value->getId());
+            // echo ;s
+            // print_r($value->getData()); 
+            $grids[] = $category->getId();
+        }*/
+        // echo "getSelectedProducts";
+        // print_r($grids); die; 
+ /*
+        $prodId = [];
         foreach ($grids as $obj) {
             $prodId[$obj] = ['position' => "12"];
         }
         return $prodId;*/
-        return $grids;
+        // return $grids;
     }
 
    /* public function getSelectedProducts()

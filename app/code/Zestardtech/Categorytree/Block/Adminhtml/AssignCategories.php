@@ -85,32 +85,20 @@ class AssignCategories extends \Magento\Backend\Block\Template
      */
     public function getProductsJson()
     {
-        // $entity_id = $this->getRequest()->getParam('id');
-        // die("sdfsdfs"); 
-        // $categoryFactory = $this->categoryFactory->create();
-        // $categoryFactory->addFieldToSelect('*');
-          // $objectManager = \Magento\Framework\App\ObjectManager::getInstance();
+        $entity_id = $this->getRequest()->getParam('id');
         $objectManager = \Magento\Framework\App\ObjectManager::getInstance();
-
-        $categoryFactory = $objectManager->get('\Magento\Catalog\Model\ResourceModel\Category\CollectionFactory');
+        $categoryFactory = $objectManager->get('\Zestardtech\Categorytree\Model\ResourceModel\Assigncategory\CollectionFactory');
         $categories = $categoryFactory->create();   
-        $categories->addAttributeToSelect('*');     
-        $categories->addAttributeToFilter('level' , 2); 
-        
-       
-        
-        $this->_options  = [];
-        foreach($categories as $cat) {
-                $catId = $cat->getId();
-                $category = $objectManager->create('Magento\Catalog\Model\Category')->load($catId);
-                // print_r($category->getData()); 
-                // die; 
-                $result[$category->getId()] = $category->getName();
+        $categories->addFieldToSelect(['assign_category_id','category_id', 'position']);   
+        $categories->addFieldToFilter('category_id', ['eq' => $entity_id]);
+        $catresult = [];
+        if (!empty($categories->getData())) {
+            foreach ($categories->getData() as $rhProducts) {
+                $catresult[$rhProducts['assign_category_id']] = $rhProducts['position'];
             }
-            //return json_encode($result);  
-             return $this->jsonEncoder->encode($result);
-        
-        // return '{}';
+             return $this->jsonEncoder->encode($catresult);
+        }
+        return '{}';
     }
 
 
