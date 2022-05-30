@@ -93,8 +93,8 @@ class AssignCategories extends \Magento\Backend\Block\Template
         $categories->addFieldToFilter('category_id', ['eq' => $entity_id]);
         $catresult = [];
         if (!empty($categories->getData())) {
-            foreach ($categories->getData() as $rhProducts) {
-                $catresult[$rhProducts['assign_category_id']] = $rhProducts['position'];
+            foreach ($categories->getData() as $rhCategory) {
+                $catresult[$rhCategory['assign_category_id']] = $rhCategory['position'];
             }
              return $this->jsonEncoder->encode($catresult);
         }

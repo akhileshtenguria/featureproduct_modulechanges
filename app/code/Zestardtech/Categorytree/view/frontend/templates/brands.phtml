@@ -1,0 +1,62 @@
+<?php 
+  // echo $html = $this->getLayout()->createBlock("Magento\Framework\View\Element\Template")->setTemplate("Magento_Theme::html/test.phtml")->toHtml();
+
+ // include ($block->getTemplateFile('Magento_Theme::html/test.phtml'));
+
+
+  // echo $html = $this->getLayout()->createBlock("Magento\Framework\View\Element\Template")->setTemplate('Magento_Theme::html/test.phtml')->toHtml(); 
+
+ ?>
+
+
+<div class="browse_categories_product" style="display: flex;
+    justify-content: center;
+    position: relative;
+    margin-bottom: 79px;
+    align-items: start;
+    margin-right: 15px;
+    height: auto;">
+<?php //echo "Testsss1111"; die;  ?>
+
+<?php $subCategories = $block->getBrandCollection(); 
+
+
+
+
+
+/*Zestardtech\Categorytree\ViewModel OptimizationPlp Start*/
+$viewModelPlp = $block->getOptimizationPlp();
+
+foreach($subCategories as $subCategory) {
+		// print_r($subCategory->getData()); 
+    	$subCat = $viewModelPlp->getCategory($subCategory->getId());
+    	$img_url = $viewModelPlp->getPlaceHolderImage();               
+    	$image_url_category = $img_url;
+    	$subcat_url = $subCat->getUrl();
+    	$subcat_name = $subCat->getName();
+    	$image_url_category = $img_url;
+    	$imgPath = $this->getBaseUrl().'pub/';
+    	$subCat->getImageUrl();
+    	$mediaUrl = $viewModelPlp->getMediaUrl();
+?>
+
+        <?php if($subCat->getImageUrl() != ''): ?>
+            <?php $image_url_category = $imgPath.$subCat->getImageUrl();?>
+        <?php endif;?>
+        <div class="category_content" style="margin-right: 53px;">
+            <div class="category_image">
+                <a href="<?= $subcat_url;?>">
+                    <img alt="<?= $subCat->getName(); ?>" src="<?= $image_url_category; ?>"  style="height: 300px; width: 300px">
+                </a>
+            </div>
+            <div class="category_name" id="category-count">
+                <a href="<?= $subcat_url?>" class="category_title_name">
+                    <?= $subcat_name; ?>        
+                </a>
+            </div>
+        </div>
+        <?php 
+}
+
+?>
+</div>
